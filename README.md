@@ -25,5 +25,5 @@ This Virtual Classroom aims to redefine e-learning by providing a user-friendly,
 
 [S Bharath](https://github.com/S-Bharath16)
 
-[Tharun Kumar A](https://github.com/)
+[Tharun Kumar A](https://github.com/TharunKumarrA)
 
