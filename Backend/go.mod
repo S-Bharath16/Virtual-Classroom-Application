@@ -1,4 +1,4 @@
-module main.go
+module github.com/S-Bharath16/Virtual-Classroom-Application
 
 go 1.23
 
