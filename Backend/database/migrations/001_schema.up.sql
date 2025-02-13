@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS userRole (
     roleName VARCHAR(255) NOT NULL
 );
 
-INSERT INTO userRole (roleName) VALUES ('ADMIN'), ('DEPT_HEAD'), ('OFFICE'), ('PROFESSOR'), ('Nags');
+INSERT INTO userRole (roleName) VALUES ('ADMIN'), ('DEPT_HEAD'), ('OFFICE'), ('PROFESSOR'), ('Hari');
 
 CREATE TABLE IF NOT EXISTS departmentData (
     deptId SERIAL PRIMARY KEY,
