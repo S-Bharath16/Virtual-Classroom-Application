@@ -7,6 +7,12 @@ import (
 	"github.com/joho/godotenv"
 )
 
+type Config struct {
+	DBUrl       string
+	ServerPort  string
+	Environment string
+}
+
 func LoadEnv() {
 	err := godotenv.Load(".env")
 	if err != nil {
@@ -14,6 +20,12 @@ func LoadEnv() {
 	}
 }
 
-func GetEnv(key string) string {
-	return os.Getenv(key)
+func GetConfig() Config {
+	LoadEnv()
+
+	return Config{
+		DBUrl:       os.Getenv("DB_URL"),
+		ServerPort:  os.Getenv("SERVER_PORT"),
+		Environment: os.Getenv("ENVIRONMENT"),
+	}
 }

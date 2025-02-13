@@ -1,0 +1,16 @@
+DROP TABLE IF EXISTS assignmentSubmission;
+DROP TABLE IF EXISTS assignmentData;
+DROP TABLE IF EXISTS quizSubmission;
+DROP TABLE IF EXISTS quizData;
+DROP TABLE IF EXISTS attendanceData;
+DROP TABLE IF EXISTS classRoomData;
+DROP TABLE IF EXISTS studentCourse;
+DROP TABLE IF EXISTS courseFaculty;
+DROP TABLE IF EXISTS courseData;
+DROP TABLE IF EXISTS forgotPasswordManagement;
+DROP TABLE IF EXISTS forgotPasswordStudent;
+DROP TABLE IF EXISTS studentData;
+DROP TABLE IF EXISTS managementData;
+DROP TABLE IF EXISTS departmentData;
+DROP TABLE IF EXISTS userRole;
+DELETE FROM schema_migrations;
