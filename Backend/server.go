@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	// "sync"
+	"sync"
 	"Backend/config"
-	// "Backend/database"
+	"Backend/database"
 	// "Backend/routes"
 	"Backend/utilities/RSA"
+	"Backend/utilities/mailer"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -26,7 +27,7 @@ func main() {
 	portNum := ":" + cfg.ServerPort;
 
 	config.LoadEnv();
-	// database.ConnectDB();
+	database.ConnectDB();
 
 	privateKeyPath := "middleware/encryptionKeys/privateKey.pem";
 	publicKeyPath := "middleware/encryptionKeys/publicKey.pem";
@@ -43,16 +44,20 @@ func main() {
 		}
 	}
 
-	// var wg sync.WaitGroup
-	// wg.Add(1);
-	// go database.RunMigrations(&wg);
-	// wg.Wait();
+	if err := mailer.SendMail([]string{"hariprasathm777@gmail.com"}, "Test Mail", "This a testing mail for Virtual Classroom Backend"); err != nil {
+		log.Fatalf("%v", err);
+	}
+
+	var wg sync.WaitGroup
+	wg.Add(1);
+	go database.RunMigrations(&wg);
+	wg.Wait();
 
 	app := fiber.New();
 
 	// routes.RegisterItemRoutes(app);
 
-	fmt.Println("[LOG]: Server Started on Port: ", portNum)
+	fmt.Println("[LOG]: Server Started on Port:", cfg.ServerPort)
 	log.Fatal(app.Listen(":8080"))
 	fmt.Println("[LOG]: To close connection CTRL+C :-)")
 
