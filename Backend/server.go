@@ -1,16 +1,22 @@
 package main
 
 import (
-	"Backend/config"
-	"Backend/database"
-	// "Backend/routes"
+	"os"
 	"fmt"
 	"log"
 	"net/http"
-	"sync"
-
+	// "sync"
+	"Backend/config"
+	// "Backend/database"
+	// "Backend/routes"
+	"Backend/utilities/RSA"
 	"github.com/gofiber/fiber/v2"
 )
+
+func fileExists(filePath string) bool {
+	_, err := os.Stat(filePath)
+	return err == nil || !os.IsNotExist(err)
+}
 
 func main() {
 
@@ -20,12 +26,27 @@ func main() {
 	portNum := ":" + cfg.ServerPort;
 
 	config.LoadEnv();
-	database.ConnectDB();
+	// database.ConnectDB();
 
-	var wg sync.WaitGroup
-	wg.Add(1);
-	go database.RunMigrations(&wg);
-	wg.Wait();
+	privateKeyPath := "middleware/encryptionKeys/privateKey.pem";
+	publicKeyPath := "middleware/encryptionKeys/publicKey.pem";
+
+	privateKeyExists := fileExists(privateKeyPath);
+	publicKeyExists := fileExists(publicKeyPath);
+
+	if !privateKeyExists || !publicKeyExists {
+		fmt.Println("[LOG]: Key pair missing! Generating new SSH keys...");
+
+		err := RSA.GenerateRSAKeys(privateKeyPath, publicKeyPath);
+		if err != nil {
+			log.Fatalf("[ERROR]: Error generating keys: %v", err);
+		}
+	}
+
+	// var wg sync.WaitGroup
+	// wg.Add(1);
+	// go database.RunMigrations(&wg);
+	// wg.Wait();
 
 	app := fiber.New();
 
