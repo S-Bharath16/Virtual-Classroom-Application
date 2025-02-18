@@ -1,53 +1,87 @@
-package response
+package utilities
 
-import "net/http"
+import (
+	"net/http"
 
-type APIResponse struct {
-	ResponseCode int         `json:"responseCode"`
-	ResponseBody ResponseBody `json:"responseBody"`
-}
+	"Backend/models"
+)
 
-type ResponseBody struct {
-	MESSAGE string      `json:"MESSAGE"`
-	DATA    interface{} `json:"DATA"`
-}
-
-func newResponse(code int, message string, data interface{}) APIResponse {
-	return APIResponse{
+func newResponse(code int, message string, data interface{}) models.APIResponse {
+	return models.APIResponse{
 		ResponseCode: code,
-		ResponseBody: ResponseBody{
+		ResponseBody: models.ResponseBody{
 			MESSAGE: message,
 			DATA:    data,
 		},
 	}
 }
 
-
-func SetResponseOk(message string, data interface{}) APIResponse {
-	return newResponse(http.StatusOK, message, data);
+func SetResponseOk(message string, data ...interface{}) models.APIResponse {
+	var d interface{}
+	if len(data) == 0 {
+		d = map[string]interface{}{}
+	} else {
+		d = data[0]
+	}
+	return newResponse(http.StatusOK, message, d)
 }
 
-
-func SetResponseNotFound(message string, data interface{}) APIResponse {
-	return newResponse(http.StatusNotFound, message, data);
+func SetResponseNotFound(message string, data ...interface{}) models.APIResponse {
+	var d interface{}
+	if len(data) == 0 {
+		d = map[string]interface{}{}
+	} else {
+		d = data[0]
+	}
+	return newResponse(http.StatusNotFound, message, d)
 }
 
-func SetResponseBadRequest(message string, data interface{}) APIResponse {
-	return newResponse(http.StatusBadRequest, message, data);
+func SetResponseBadRequest(message string, data ...interface{}) models.APIResponse {
+	var d interface{}
+	if len(data) == 0 {
+		d = map[string]interface{}{}
+	} else {
+		d = data[0]
+	}
+	return newResponse(http.StatusBadRequest, message, d)
 }
 
-func SetResponseInternalError(data interface{}) APIResponse {
-	return newResponse(http.StatusInternalServerError, "Internal Server Error occurred :(", data);
+func SetResponseInternalError(message string, data ...interface{}) models.APIResponse {
+	var d interface{}
+	if len(data) == 0 {
+		d = map[string]interface{}{}
+	} else {
+		d = data[0]
+	}
+	return newResponse(http.StatusInternalServerError, message, d)
 }
 
-func SetResponseUnauth(data interface{}) APIResponse {
-	return newResponse(http.StatusUnauthorized, "Unauthorized Access Denied !!", data);
+func SetResponseUnauth(data ...interface{}) models.APIResponse {
+	var d interface{}
+	if len(data) == 0 {
+		d = map[string]interface{}{}
+	} else {
+		d = data[0]
+	}
+	return newResponse(http.StatusUnauthorized, "Unauthorized Access Denied !!", d)
 }
 
-func SetResponseTimedOut(message string, data interface{}) APIResponse {
-	return newResponse(http.StatusRequestTimeout, message, data);
+func SetResponseTimedOut(message string, data ...interface{}) models.APIResponse {
+	var d interface{}
+	if len(data) == 0 {
+		d = map[string]interface{}{}
+	} else {
+		d = data[0]
+	}
+	return newResponse(http.StatusRequestTimeout, message, d)
 }
 
-func SetResponseTransactionFailed(message string, data interface{}) APIResponse {
-	return newResponse(http.StatusAccepted, message, data);
+func SetResponseTransactionFailed(message string, data ...interface{}) models.APIResponse {
+	var d interface{}
+	if len(data) == 0 {
+		d = map[string]interface{}{}
+	} else {
+		d = data[0]
+	}
+	return newResponse(http.StatusAccepted, message, d)
 }

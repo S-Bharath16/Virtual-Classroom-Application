@@ -35,6 +35,25 @@ func RegisterStudent(c *fiber.Ctx) error {
 		})
 	}
 
+	// Check if  dept exists
+	if student.DeptID != nil {
+		var exists bool
+		checkDeptQuery := `SELECT EXISTS (SELECT 1 FROM deptData WHERE deptID = $1)`
+		err = dbConn.QueryRow(checkDeptQuery, student.DeptID).Scan(&exists)
+		if err != nil {
+			log.Printf("Error checking department existence: %v", err)
+			return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+				"error": "Error checking if department exists",
+			})
+		}
+		if !exists {
+			log.Printf("Department ID %d does not exist", *student.DeptID)
+			return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+				"error": "Invalid department ID. Please check and try again.",
+			})
+		}
+	}
+
 	// SQL query using the exact column names
 	query := `
 		INSERT INTO studentData 
