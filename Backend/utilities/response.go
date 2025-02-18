@@ -8,16 +8,16 @@ type APIResponse struct {
 }
 
 type ResponseBody struct {
-	Message string      `json:"MESSAGE"`
-	Data    interface{} `json:"DATA"`
+	MESSAGE string      `json:"MESSAGE"`
+	DATA    interface{} `json:"DATA"`
 }
 
 func newResponse(code int, message string, data interface{}) APIResponse {
 	return APIResponse{
 		ResponseCode: code,
 		ResponseBody: ResponseBody{
-			Message: message,
-			Data:    data,
+			MESSAGE: message,
+			DATA:    data,
 		},
 	}
 }

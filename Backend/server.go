@@ -8,9 +8,8 @@ import (
 	"sync"
 	"Backend/config"
 	"Backend/database"
-	// "Backend/routes"
+	"Backend/routes"
 	"Backend/utilities/RSA"
-	"Backend/utilities/mailer"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -44,10 +43,6 @@ func main() {
 		}
 	}
 
-	if err := mailer.SendMail([]string{"hariprasathm777@gmail.com"}, "Test Mail", "This a testing mail for Virtual Classroom Backend"); err != nil {
-		log.Fatalf("%v", err);
-	}
-
 	var wg sync.WaitGroup
 	wg.Add(1);
 	go database.RunMigrations(&wg);
@@ -55,9 +50,9 @@ func main() {
 
 	app := fiber.New();
 
-	// routes.RegisterItemRoutes(app);
+	routes.RegisterStudent(app);
 
-	fmt.Println("[LOG]: Server Started on Port:", cfg.ServerPort)
+	fmt.Println("[LOG]: Server Started on Port: ", portNum)
 	log.Fatal(app.Listen(":8080"))
 	fmt.Println("[LOG]: To close connection CTRL+C :-)")
 
