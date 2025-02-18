@@ -11,4 +11,5 @@ func RegisterStudent(app *fiber.App) {
 	admin := api.Group("/admin")
 	admin.Post("/registerStudent", modules.RegisterStudent);
 	admin.Post("/registerDepartment", modules.RegisterDepartment);
+	admin.Post("/registerFaculty", modules.RegisterFaculty);
 }

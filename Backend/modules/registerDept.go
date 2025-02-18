@@ -41,7 +41,6 @@ func RegisterDepartment(c *fiber.Ctx) error {
 	var existingID int
 	err = dbConn.QueryRow(checkQuery, dept.DepartmentName).Scan(&existingID)
 	if err == nil {
-		// If a row is found
 		log.Printf("Department %s already exists with ID: %d", dept.DepartmentName, existingID)
 		return c.Status(http.StatusConflict).JSON(fiber.Map{
 			"error": "Department already exists",

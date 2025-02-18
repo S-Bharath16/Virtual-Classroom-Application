@@ -26,7 +26,7 @@ func RegisterStudent(c *fiber.Ctx) error {
 		})
 	}
 
-	// Get the underlying sql.DB from GORM
+	
 	dbConn, err := database.GetDB().DB()
 	if err != nil {
 		log.Printf("Error getting DB connection: %v", err)
@@ -35,7 +35,7 @@ func RegisterStudent(c *fiber.Ctx) error {
 		})
 	}
 
-	// Check if  dept exists
+	// deptID validation
 	if student.DeptID != nil {
 		var exists bool
 		checkDeptQuery := `SELECT EXISTS (SELECT 1 FROM deptData WHERE deptID = $1)`
@@ -54,7 +54,7 @@ func RegisterStudent(c *fiber.Ctx) error {
 		}
 	}
 
-	// SQL query using the exact column names
+	// insert query
 	query := `
 		INSERT INTO studentData 
 		(rollNumber, emailID, studentName, startYear, endYear, deptID, section, semester)
