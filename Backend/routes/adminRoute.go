@@ -13,4 +13,5 @@ func RegisterStudent(app *fiber.App) {
 	admin.Post("/registerDepartment", modules.RegisterDepartment);
 	admin.Post("/registerFaculty", modules.RegisterFaculty);
 	admin.Post("/registerCourse", modules.RegisterCourse);
+	admin.Post("/assignFaculty", modules.AssignFaculty);
 }

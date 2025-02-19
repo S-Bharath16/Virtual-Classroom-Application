@@ -8,6 +8,6 @@ type Student struct {
 	StartYear   int    `gorm:"not null" json:"startYear"`
 	EndYear     int    `gorm:"not null" json:"endYear"`
 	DeptID      *uint  `gorm:"foreignKey:DeptID;references:DeptID;onDelete:SET NULL" json:"deptID"`
-	Section     string `gorm:"not null" json:"section"`
-	Semester    int    `gorm:"not null" json:"semester"`
+	SectionID   *uint  `gorm:"foreignKey:SectionID;references:SectionID;onDelete:SET NULL" json:"sectionID"`
+	SemesterID  *uint  `gorm:"foreignKey:SemesterID;references:SemesterID;onDelete:SET NULL" json:"semesterID"`
 }

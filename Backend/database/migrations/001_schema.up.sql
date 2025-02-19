@@ -13,6 +13,19 @@ CREATE TABLE adminData (
     updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+--Section table
+CREATE TABLE sectionData (
+    sectionID SERIAL PRIMARY KEY,
+    sectionName VARCHAR(10) UNIQUE NOT NULL
+);
+
+--Semester table
+CREATE TABLE semesterData (
+    semesterID SERIAL PRIMARY KEY,
+    semesterNumber INT UNIQUE NOT NULL
+);
+
+
 -- Faculty Table
 CREATE TABLE facultyData (
     facultyID SERIAL PRIMARY KEY,
@@ -32,8 +45,8 @@ CREATE TABLE studentData (
     startYear INT NOT NULL,
     endYear INT NOT NULL,
     deptID INT REFERENCES deptData(deptID) ON DELETE SET NULL,
-    section VARCHAR(10) NOT NULL,
-    semester INT NOT NULL
+    sectionID INT REFERENCES sectionData(sectionID) ON DELETE SET NULL,
+    semesterID INT REFERENCES semesterData(semesterID) ON DELETE SET NULL
 );
 
 -- Course Table
@@ -53,8 +66,8 @@ CREATE TABLE courseFaculty (
     classroomID SERIAL PRIMARY KEY,
     courseID INT REFERENCES courseData(courseID) ON DELETE CASCADE,
     facultyID INT REFERENCES facultyData(facultyID) ON DELETE CASCADE,
-    section VARCHAR(10) NOT NULL,
-    semester INT NOT NULL,
+    sectionID INT REFERENCES sectionData(sectionID) ON DELETE SET NULL,
+    semesterID INT REFERENCES semesterData(semesterID) ON DELETE SET NULL,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     createdBy INT REFERENCES adminData(adminID) ON DELETE SET NULL,
     updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

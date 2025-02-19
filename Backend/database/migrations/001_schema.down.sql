@@ -10,4 +10,6 @@ DROP TABLE IF EXISTS studentData;
 DROP TABLE IF EXISTS facultyData;
 DROP TABLE IF EXISTS adminData;
 DROP TABLE IF EXISTS deptData;
+DROP TABLE IF EXISTS sectionData;
+DROP TABLE IF EXISTS semesterData;
 DELETE FROM schema_migrations;
