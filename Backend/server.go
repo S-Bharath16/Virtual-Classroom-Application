@@ -51,6 +51,8 @@ func main() {
 	app := fiber.New();
 
 	routes.RegisterStudent(app);
+	routes.RegisterFacultyRoutes(app);
+	routes.RegisterStudentRoutes(app);
 
 	fmt.Println("[LOG]: Server Started on Port: ", portNum)
 	log.Fatal(app.Listen(":8080"))
