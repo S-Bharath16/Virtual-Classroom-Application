@@ -11,3 +11,14 @@ type Student struct {
 	SectionID   *uint  `gorm:"foreignKey:SectionID;references:SectionID;onDelete:SET NULL" json:"sectionID"`
 	SemesterID  *uint  `gorm:"foreignKey:SemesterID;references:SemesterID;onDelete:SET NULL" json:"semesterID"`
 }
+
+type StudentProfile struct {
+	RollNumber     string  `json:"rollNumber"`
+	EmailID        string  `json:"emailID"`
+	StudentName    string  `json:"studentName"`
+	StartYear      int     `json:"startYear"`
+	EndYear        int     `json:"endYear"`
+	DeptName       *string `json:"deptName"`       // from deptData.deptName
+	SectionName    *string `json:"sectionName"`    // from sectionData.sectionName
+	SemesterNumber *int    `json:"semesterNumber"` // from semesterData.semesterNumber
+}
