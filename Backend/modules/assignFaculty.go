@@ -19,11 +19,11 @@ func AssignFaculty(c *fiber.Ctx) error {
 		})
 	}
 
-	// Basic validation 
-	if cf.CourseID == 0 || cf.FacultyID == 0 || cf.SectionID == 0 || cf.SemesterID == 0 {
+	// Basic validation: required fields must be provided.
+	if cf.CourseID == 0 || cf.FacultyID == 0 || cf.SectionID == 0 || cf.SemesterID == 0 || cf.DeptID == 0 {
 		log.Println("Validation failed: missing required fields")
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"error": "courseID, facultyID, sectionID and semesterID are required",
+			"error": "courseID, facultyID, sectionID, semesterID and deptID are required",
 		})
 	}
 
@@ -35,7 +35,7 @@ func AssignFaculty(c *fiber.Ctx) error {
 		})
 	}
 
-	// Validate if course exists
+	// Validate if course exists.
 	var courseExists bool
 	courseQuery := `SELECT EXISTS (SELECT 1 FROM courseData WHERE courseID = $1)`
 	if err := dbConn.QueryRow(courseQuery, cf.CourseID).Scan(&courseExists); err != nil {
@@ -51,7 +51,7 @@ func AssignFaculty(c *fiber.Ctx) error {
 		})
 	}
 
-	// Validate if faculty exists
+	// Validate if faculty exists.
 	var facultyExists bool
 	facultyQuery := `SELECT EXISTS (SELECT 1 FROM facultyData WHERE facultyID = $1)`
 	if err := dbConn.QueryRow(facultyQuery, cf.FacultyID).Scan(&facultyExists); err != nil {
@@ -67,7 +67,7 @@ func AssignFaculty(c *fiber.Ctx) error {
 		})
 	}
 
-	// Validate if section exists
+	// Validate if section exists.
 	var sectionExists bool
 	sectionQuery := `SELECT EXISTS (SELECT 1 FROM sectionData WHERE sectionID = $1)`
 	if err := dbConn.QueryRow(sectionQuery, cf.SectionID).Scan(&sectionExists); err != nil {
@@ -83,7 +83,7 @@ func AssignFaculty(c *fiber.Ctx) error {
 		})
 	}
 
-	// Validate if semester exists
+	// Validate if semester exists.
 	var semesterExists bool
 	semesterQuery := `SELECT EXISTS (SELECT 1 FROM semesterData WHERE semesterID = $1)`
 	if err := dbConn.QueryRow(semesterQuery, cf.SemesterID).Scan(&semesterExists); err != nil {
@@ -99,30 +99,50 @@ func AssignFaculty(c *fiber.Ctx) error {
 		})
 	}
 
-	// Validate : Basic rule: one section in one semester can have only one faculty for a particular course .
-	// Two faculties can't handle the same course for the same section . But this may change for each section .
-	//  A faculty can take the same course across multiple sections
+	// Validate if deptID exists.
+	var deptExists bool
+	deptQuery := `SELECT EXISTS (SELECT 1 FROM deptData WHERE deptID = $1)`
+	if err := dbConn.QueryRow(deptQuery, cf.DeptID).Scan(&deptExists); err != nil {
+		log.Printf("Error checking department existence: %v", err)
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Error checking department existence",
+		})
+	}
+	if !deptExists {
+		log.Printf("Department ID %d does not exist", cf.DeptID)
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid deptID. Please check and try again.",
+		})
+	}
+
+	// Validate basic rule:
+	// "One section in one semester in one department can have only one faculty for a particular course.
+	// Two faculties can't handle the same course for the same section in the same department.
+	// (A faculty can take the same course across multiple sections, and can also take different courses across sections in different semesters/departments.)"
 	var alreadyAssigned bool
 	assignmentQuery := `
 		SELECT EXISTS (
 			SELECT 1 FROM courseFaculty 
-			WHERE courseID = $1 AND sectionID = $2 AND semesterID = $3
+			WHERE courseID = $1 
+			  AND sectionID = $2 
+			  AND semesterID = $3
+			  AND deptID = $4
 		)
 	`
-	if err := dbConn.QueryRow(assignmentQuery, cf.CourseID, cf.SectionID, cf.SemesterID).Scan(&alreadyAssigned); err != nil {
+	if err := dbConn.QueryRow(assignmentQuery, cf.CourseID, cf.SectionID, cf.SemesterID, cf.DeptID).Scan(&alreadyAssigned); err != nil {
 		log.Printf("Error checking existing assignment: %v", err)
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Error checking existing assignment",
 		})
 	}
 	if alreadyAssigned {
-		log.Printf("Assignment already exists for courseID %d in sectionID %d and semesterID %d", cf.CourseID, cf.SectionID, cf.SemesterID)
+		log.Printf("Assignment already exists for courseID %d in sectionID %d, semesterID %d, and deptID %d", cf.CourseID, cf.SectionID, cf.SemesterID, cf.DeptID)
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"error": "A faculty is already assigned for this course in the specified section and semester.",
+			"error": "A faculty is already assigned for this course in the specified section, semester, and department.",
 		})
 	}
 
-	// adminID validation
+	// Validate adminID for createdBy and updatedBy remains unchanged.
 	if cf.CreatedBy != nil {
 		var adminExists bool
 		adminQuery := `SELECT EXISTS (SELECT 1 FROM adminData WHERE adminID = $1)`
@@ -157,11 +177,11 @@ func AssignFaculty(c *fiber.Ctx) error {
 		}
 	}
 
-	// assignFaculty
+	// Insert the courseFaculty record (including the mandatory deptID).
 	insertQuery := `
 		INSERT INTO courseFaculty 
-		(courseID, facultyID, sectionID, semesterID, createdBy, updatedBy)
-		VALUES ($1, $2, $3, $4, $5, $6)
+		(courseID, facultyID, sectionID, semesterID, deptID, createdBy, updatedBy)
+		VALUES ($1, $2, $3, $4, $5, $6, $7)
 		RETURNING classroomID
 	`
 	var newID int
@@ -170,6 +190,7 @@ func AssignFaculty(c *fiber.Ctx) error {
 		cf.FacultyID,
 		cf.SectionID,
 		cf.SemesterID,
+		cf.DeptID,
 		cf.CreatedBy,
 		cf.UpdatedBy,
 	).Scan(&newID)
