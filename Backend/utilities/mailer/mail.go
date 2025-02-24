@@ -9,14 +9,19 @@ import (
 	"net/smtp"
 )
 
-func SendMail(emailID []string, mailSubject string, mailBody string, category string) error {
+func SendMail(emailID []string, mailSubject string, mailBody string, courseName string, startTime string, endTime string, category string) error {
 	cfg := config.GetConfig()
 
 	var templateFile string
 	switch category {
 	case "announcement":
 		templateFile = "C:/Users/Dell/OneDrive/Desktop/6th Semester/Virtual-Classroom-Application/Backend/utilities/templates/announcementMailTemplate.html"
+	case "quizCreation":
+		templateFile = "C:/Users/Dell/OneDrive/Desktop/6th Semester/Virtual-Classroom-Application/Backend/utilities/templates/quizCreationMailTemplate.html"
+	default:
+		return fmt.Errorf("unknown email category: %s", category)
 	}
+	
 
 	// Load email template
 	tmpl, err := template.ParseFiles(templateFile)

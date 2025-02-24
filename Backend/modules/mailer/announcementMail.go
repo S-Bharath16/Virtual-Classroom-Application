@@ -3,6 +3,7 @@ package mailer
 import (
 	"fmt"
 	"log"
+	"time"
 	"net/http"
 	"Backend/database"
 	"Backend/utilities/mailer"
@@ -66,7 +67,12 @@ func SendAnnouncementMail(c *fiber.Ctx) error {
 	}
 
 	// Call SendMail function
-	if err := mailer.SendMail(emailIDs, request.Subject, request.Body, "announcement"); err != nil {
+	var startTime, endTime time.Time
+
+	startTimeFormatted := startTime.Format("2006-01-02 15:04:05")
+	endTimeFormatted := endTime.Format("2006-01-02 15:04:05")
+
+	if err := mailer.SendMail(emailIDs, request.Subject, request.Body, "", startTimeFormatted, endTimeFormatted, "announcement"); err != nil {
 		log.Println("Failed to send emails:", err)
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Failed to send emails",

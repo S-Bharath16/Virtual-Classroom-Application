@@ -7,6 +7,7 @@ import (
 
 	"Backend/database"
 	"Backend/models"
+	"Backend/modules/mailer"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -108,5 +109,6 @@ func CreateQuiz(c *fiber.Ctx) error {
 	}
 
 	quiz.QuizID = uint(newQuizID)
+	mailer.QuizCreationMail("Quiz Creation Alert Mail", "", int(quiz.ClassroomID));
 	return c.Status(http.StatusCreated).JSON(quiz)
 }
