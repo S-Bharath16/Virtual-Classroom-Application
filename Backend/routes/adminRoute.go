@@ -2,7 +2,7 @@ package routes
 
 import (
 	"Backend/modules"
-
+	"Backend/modules/mailer"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -16,4 +16,5 @@ func RegisterStudent(app *fiber.App) {
 	admin.Post("/assignFaculty", modules.AssignFaculty);
 	admin.Get("/getAllDepartments", modules.GetAllDepartments);
 	admin.Get("/getAllFaculty", modules.GetAllFaculty);
+	admin.Post("/announcementMail", mailer.SendAnnouncementMail);
 }

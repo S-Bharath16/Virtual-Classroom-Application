@@ -4,6 +4,8 @@ CREATE TABLE deptData (
     deptName VARCHAR(255) NOT NULL UNIQUE
 );
 
+INSERT INTO deptData (deptName) VALUES ('CSE');
+
 -- Admin Table
 CREATE TABLE adminData (
     adminID SERIAL PRIMARY KEY,
@@ -19,12 +21,27 @@ CREATE TABLE sectionData (
     sectionName VARCHAR(10) UNIQUE NOT NULL
 );
 
+INSERT INTO sectionData (sectionName) VALUES ('A');
+INSERT INTO sectionData (sectionName) VALUES ('B');
+INSERT INTO sectionData (sectionName) VALUES ('C');
+INSERT INTO sectionData (sectionName) VALUES ('D');
+INSERT INTO sectionData (sectionName) VALUES ('E');
+INSERT INTO sectionData (sectionName) VALUES ('F');
+
 --Semester table
 CREATE TABLE semesterData (
     semesterID SERIAL PRIMARY KEY,
     semesterNumber INT UNIQUE NOT NULL
 );
 
+INSERT INTO semesterData (semesterNumber) VALUES (1);
+INSERT INTO semesterData (semesterNumber) VALUES (2);
+INSERT INTO semesterData (semesterNumber) VALUES (3);
+INSERT INTO semesterData (semesterNumber) VALUES (4);
+INSERT INTO semesterData (semesterNumber) VALUES (5);
+INSERT INTO semesterData (semesterNumber) VALUES (6);
+INSERT INTO semesterData (semesterNumber) VALUES (7);
+INSERT INTO semesterData (semesterNumber) VALUES (8);
 
 -- Faculty Table
 CREATE TABLE facultyData (
@@ -48,6 +65,9 @@ CREATE TABLE studentData (
     sectionID INT REFERENCES sectionData(sectionID) ON DELETE SET NULL,
     semesterID INT REFERENCES semesterData(semesterID) ON DELETE SET NULL
 );
+
+INSERT INTO studentData (rollNumber, emailID, studentName, startYear, endYear, deptID, sectionID, semesterID)
+VALUES ('CB.EN.U4CSE22240', 'umaiyalramesh@gmail.com', 'Naganathan', 2022, 2026, 1, 3, 6);
 
 -- Course Table
 CREATE TABLE courseData (
