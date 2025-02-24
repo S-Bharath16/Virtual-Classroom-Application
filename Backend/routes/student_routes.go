@@ -11,4 +11,5 @@ func RegisterStudentRoutes(app *fiber.App) {
 	student := api.Group("/student")
 	student.Get("/getQuiz", modules.GetQuiz);
 	student.Get("/profile", modules.GetStudentProfile);
+	student.Get("/getCourses", modules.GetCourses)
 }

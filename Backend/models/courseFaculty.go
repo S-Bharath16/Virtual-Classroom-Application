@@ -8,6 +8,7 @@ type CourseFaculty struct {
 	FacultyID   uint      `gorm:"not null" json:"facultyID"`
 	SectionID   uint      `gorm:"not null" json:"sectionID"`
 	SemesterID  uint      `gorm:"not null" json:"semesterID"`
+	DeptID      uint      `gorm:"not null" json:"deptID"`
 	CreatedAt   time.Time `json:"createdAt"`
 	CreatedBy   *uint     `json:"createdBy"` // adminID
 	UpdatedAt   time.Time `json:"updatedAt"`

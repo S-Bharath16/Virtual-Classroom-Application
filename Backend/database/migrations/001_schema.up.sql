@@ -68,6 +68,7 @@ CREATE TABLE courseFaculty (
     facultyID INT REFERENCES facultyData(facultyID) ON DELETE CASCADE,
     sectionID INT REFERENCES sectionData(sectionID) ON DELETE SET NULL,
     semesterID INT REFERENCES semesterData(semesterID) ON DELETE SET NULL,
+    deptID INT REFERENCES deptData(deptID) ON DELETE SET NULL,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     createdBy INT REFERENCES adminData(adminID) ON DELETE SET NULL,
     updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
