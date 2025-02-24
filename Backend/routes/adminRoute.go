@@ -19,4 +19,6 @@ func RegisterStudent(app *fiber.App) {
 	admin.Get("/getAllFaculty", modules.GetAllFaculty);
 	admin.Post("/announcementMail", mailer.SendAnnouncementMail);
 	admin.Put("/updateCourse", modules.UpdateCourse);
+	admin.Delete("/removestudent", modules.RemoveStudent);
+	admin.Delete("/removeCourse", modules.RemoveCourse);
 }
