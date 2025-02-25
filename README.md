@@ -19,7 +19,7 @@ Data Analytics: APIs for visualizing student performance and engagement metrics.
 This Virtual Classroom aims to redefine e-learning by providing a user-friendly, feature-rich, and efficient platform for educators and learners alike.
 
 # Contributors 
-[M Hari Prasath](https://github.com/Hariprasath8064)
+[Hariprasath M](https://github.com/Hariprasath8064)
 
 [Naganathan M R](https://github.com/Naganathan05)
 
