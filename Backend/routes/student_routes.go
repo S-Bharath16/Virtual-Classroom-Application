@@ -11,7 +11,8 @@ func RegisterStudentRoutes(app *fiber.App) {
 	student := api.Group("/student")
 	student.Get("/getQuiz", Studentmodules.GetQuiz);
 	student.Get("/profile", Studentmodules.GetStudentProfile);
-	student.Get("/getCourses", Studentmodules.GetCourses)
+	student.Get("/getCourses", Studentmodules.GetCourses);
+	student.Get("/getallQuizzes", Studentmodules.GetAllQuizzes);
 	student.Get("/auth/google/url", Auth.HandleGoogleURL);
 	student.Get("/auth/google/callback", Auth.HandleGoogleCallback);
 }
