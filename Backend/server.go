@@ -1,15 +1,16 @@
 package main
 
 import (
-	"os"
-	"fmt"
-	"log"
-	"net/http"
-	"sync"
 	"Backend/config"
 	"Backend/database"
 	"Backend/routes"
 	"Backend/utilities/RSA"
+	"fmt"
+	"log"
+	"net/http"
+	"os"
+	"sync"
+
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -20,39 +21,39 @@ func fileExists(filePath string) bool {
 
 func main() {
 
-	fmt.Println("[LOG]: Starting Virtual Classroom Backend Server..");
+	fmt.Println("[LOG]: Starting Virtual Classroom Backend Server..")
 
-	cfg := config.GetConfig();
-	portNum := ":" + cfg.ServerPort;
+	cfg := config.GetConfig()
+	portNum := ":" + cfg.ServerPort
 
-	config.LoadEnv();
-	database.ConnectDB();
+	config.LoadEnv()
+	database.ConnectDB()
 
-	privateKeyPath := "middleware/encryptionKeys/privateKey.pem";
-	publicKeyPath := "middleware/encryptionKeys/publicKey.pem";
+	privateKeyPath := "middleware/encryptionKeys/privateKey.pem"
+	publicKeyPath := "middleware/encryptionKeys/publicKey.pem"
 
-	privateKeyExists := fileExists(privateKeyPath);
-	publicKeyExists := fileExists(publicKeyPath);
+	privateKeyExists := fileExists(privateKeyPath)
+	publicKeyExists := fileExists(publicKeyPath)
 
 	if !privateKeyExists || !publicKeyExists {
-		fmt.Println("[LOG]: Key pair missing! Generating new SSH keys...");
+		fmt.Println("[LOG]: Key pair missing! Generating new SSH keys...")
 
-		err := RSA.GenerateRSAKeys(privateKeyPath, publicKeyPath);
+		err := RSA.GenerateRSAKeys(privateKeyPath, publicKeyPath)
 		if err != nil {
-			log.Fatalf("[ERROR]: Error generating keys: %v", err);
+			log.Fatalf("[ERROR]: Error generating keys: %v", err)
 		}
 	}
 
 	var wg sync.WaitGroup
-	wg.Add(1);
-	go database.RunMigrations(&wg);
-	wg.Wait();
+	wg.Add(1)
+	go database.RunMigrations(&wg)
+	wg.Wait()
 
-	app := fiber.New();
+	app := fiber.New()
 
-	routes.RegisterStudent(app);
-	routes.RegisterFacultyRoutes(app);
-	routes.RegisterStudentRoutes(app);
+	routes.RegisterStudent(app)
+	routes.RegisterFacultyRoutes(app)
+	routes.RegisterStudentRoutes(app)
 
 	fmt.Println("[LOG]: Server Started on Port: ", portNum)
 	log.Fatal(app.Listen(":8080"))

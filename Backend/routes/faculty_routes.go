@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"Backend/modules"
+	"Backend/modules/Facultymodules"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -9,6 +9,6 @@ import (
 func RegisterFacultyRoutes(app *fiber.App) {
 	api := app.Group("/api")
 	faculty := api.Group("/faculty")
-	faculty.Post("/createQuiz", modules.CreateQuiz)
-	faculty.Put("/updateFaculty", modules.UpdateFaculty)
+	faculty.Post("/createQuiz", Facultymodules.CreateQuiz)
+	faculty.Put("/updateFaculty", Facultymodules.UpdateFaculty)
 }
