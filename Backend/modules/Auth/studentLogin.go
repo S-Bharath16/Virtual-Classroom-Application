@@ -1,30 +1,55 @@
 package Auth
 
 import (
-	"os"
-	"fmt"
-	"log"
-	"time"
 	"context"
 	"crypto/rsa"
 	"database/sql"
+	"encoding/json"
+	"fmt"
+	"log"
+	"os"
+	"sync"
+	"time"
 
-	"Backend/config"
-	"Backend/models"
-	"Backend/database"
-	
-	"golang.org/x/oauth2"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v4"
-	"golang.org/x/oauth2/microsoft"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
+
+	"Backend/config"
+	"Backend/database"
+	"Backend/models"
 )
 
 var (
-	privateKey *rsa.PrivateKey
-	publicKey  *rsa.PublicKey
-	oauthState = "randomStateString"
-	oauthConf  *oauth2.Config
+	oauthConfig oauth2.Config
+	privateKey  *rsa.PrivateKey
+	publicKey   *rsa.PublicKey
+	oauthState  = "randomStateString"
+	initOnce    sync.Once
 )
+
+func InitOAuth() {
+	initOnce.Do(func() {
+		cfg := config.GetConfig()
+		if cfg == nil {
+			log.Fatal("Failed to load configuration. Ensure .env is correctly set.")
+		}
+
+		oauthConfig = oauth2.Config{
+			ClientID:     cfg.OAuthConfig.ClientID,
+			ClientSecret: cfg.OAuthConfig.ClientSecret,
+			RedirectURL:  cfg.OAuthConfig.RedirectURL,
+			Scopes:       cfg.OAuthConfig.Scopes,
+			Endpoint:     google.Endpoint,
+		}
+
+		// Load private and public keys at initialization
+		if err := LoadKeys(); err != nil {
+			log.Fatalf("Failed to load encryption keys: %v", err)
+		}
+	})
+}
 
 func LoadKeys() error {
 	privBytes, err := os.ReadFile("middleware/encryptionKeys/privateKey.pem")
@@ -50,30 +75,18 @@ func LoadKeys() error {
 	return nil
 }
 
-func init() {
+func HandleGoogleURL(c *fiber.Ctx) error {
+	InitOAuth()
 
-	if err := LoadKeys(); err != nil {
-		log.Fatalf("Failed to load RSA keys: %v", err)
+	authURL := oauthConfig.AuthCodeURL(oauthState, oauth2.AccessTypeOffline)
+	if authURL == "" {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to generate OAuth URL"})
 	}
 
-	cfg := config.GetConfig()
-
-	oauthConf = &oauth2.Config{
-		ClientID:     cfg.OAuthConfig.ClientID,
-		ClientSecret: cfg.OAuthConfig.ClientSecret,
-		RedirectURL:  cfg.OAuthConfig.RedirectURL,
-		Scopes:       cfg.OAuthConfig.Scopes,
-		Endpoint:     microsoft.AzureADEndpoint(cfg.OAuthConfig.Tenant),
-	}
-}
-
-func HandleMicrosoftURL(c *fiber.Ctx) error {
-	authURL := oauthConf.AuthCodeURL(oauthState, oauth2.AccessTypeOffline)
 	return c.JSON(fiber.Map{"URL": authURL})
 }
 
-func HandleMicrosoftCallback(c *fiber.Ctx) error {
-
+func HandleGoogleCallback(c *fiber.Ctx) error {
 	state := c.Query("state")
 	if state != oauthState {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid OAuth state"})
@@ -84,45 +97,41 @@ func HandleMicrosoftCallback(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Authorization code not found"})
 	}
 
-	token, err := oauthConf.Exchange(context.Background(), code)
+	token, err := oauthConfig.Exchange(context.Background(), code)
 	if err != nil {
 		log.Printf("[ERROR]: Code exchange failed: %v", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Code exchange failed"})
 	}
 
-	rawIDToken, ok := token.Extra("id_token").(string)
-	if !ok {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "No id_token found in token response"})
-	}
-
-	parsedToken, _, err := new(jwt.Parser).ParseUnverified(rawIDToken, jwt.MapClaims{})
+	client := oauthConfig.Client(context.Background(), token)
+	userInfoResp, err := client.Get("https://www.googleapis.com/oauth2/v3/userinfo")
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to parse id_token"})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to get user info"})
+	}
+	defer userInfoResp.Body.Close()
+
+	var userInfo struct {
+		Email string `json:"email"`
+		Name  string `json:"name"`
 	}
 
-	claims, ok := parsedToken.Claims.(jwt.MapClaims)
-	if !ok {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to extract claims from id_token"})
-	}
-
-	email, ok := claims["preferred_username"].(string)
-	if !ok {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Email not found in token claims"})
+	if err := json.NewDecoder(userInfoResp.Body).Decode(&userInfo); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to parse user info"})
 	}
 
 	dbConn, err := database.GetDB().DB()
 	if err != nil {
-		log.Printf("[ERROR]: Error getting DB connection: %v", err)
+		log.Printf("Error getting DB connection: %v", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to get database connection"})
 	}
 
 	var student models.Student
-	rawQuery := `
+	query := `
         SELECT studentID, rollNumber, emailID, studentName, startYear, endYear, deptID, sectionID, semesterID 
         FROM studentData 
         WHERE emailID = $1
     `
-	err = dbConn.QueryRow(rawQuery, email).Scan(
+	err = dbConn.QueryRow(query, userInfo.Email).Scan(
 		&student.StudentID,
 		&student.RollNumber,
 		&student.EmailID,
@@ -138,7 +147,7 @@ func HandleMicrosoftCallback(c *fiber.Ctx) error {
 		if err == sql.ErrNoRows {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Student not found"})
 		}
-		log.Printf("[ERROR]: Error querying studentData: %v", err)
+		log.Printf("Error querying studentData: %v", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Database query error"})
 	}
 
@@ -149,7 +158,7 @@ func HandleMicrosoftCallback(c *fiber.Ctx) error {
 		"role":  "Student",
 		"exp":   time.Now().Add(72 * time.Hour).Unix(),
 	}
-	
+
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodRS256, claimsJWT)
 	tokenString, err := jwtToken.SignedString(privateKey)
 	if err != nil {

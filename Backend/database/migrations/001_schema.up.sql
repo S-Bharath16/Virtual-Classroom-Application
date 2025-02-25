@@ -67,7 +67,7 @@ CREATE TABLE studentData (
 );
 
 INSERT INTO studentData (rollNumber, emailID, studentName, startYear, endYear, deptID, sectionID, semesterID)
-VALUES ('CB.EN.U4CSE22240', 'umaiyalramesh@gmail.com', 'Naganathan', 2022, 2026, 1, 3, 6);
+VALUES ('CB.EN.U4CSE22240', 'naganathan1555@gmail.com', 'Naganathan', 2022, 2026, 1, 3, 6);
 
 -- Course Table
 CREATE TABLE courseData (
