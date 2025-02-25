@@ -1,4 +1,4 @@
-package modules
+package Adminmodules
 
 import (
 	"database/sql"

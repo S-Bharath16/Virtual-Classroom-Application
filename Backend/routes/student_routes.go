@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"Backend/modules"
+	"Backend/modules/Studentmodules"
 	"Backend/modules/Auth"
 	"github.com/gofiber/fiber/v2"
 )
@@ -9,9 +9,9 @@ import (
 func RegisterStudentRoutes(app *fiber.App) {
 	api := app.Group("/api")
 	student := api.Group("/student")
-	student.Get("/getQuiz", modules.GetQuiz);
-	student.Get("/profile", modules.GetStudentProfile);
-	student.Get("/getCourses", modules.GetCourses)
+	student.Get("/getQuiz", Studentmodules.GetQuiz);
+	student.Get("/profile", Studentmodules.GetStudentProfile);
+	student.Get("/getCourses", Studentmodules.GetCourses)
 	student.Get("/auth/microsoft/url", Auth.HandleMicrosoftURL);
 	student.Get("/auth/microsoft/callback", Auth.HandleMicrosoftCallback);
 }
