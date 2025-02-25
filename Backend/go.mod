@@ -6,11 +6,14 @@ toolchain go1.23.4
 
 require (
 	github.com/gofiber/fiber/v2 v2.52.6
+	github.com/golang-jwt/jwt/v4 v4.5.1
 	github.com/golang-migrate/migrate/v4 v4.18.2
+	golang.org/x/oauth2 v0.18.0
 	gorm.io/gorm v1.25.12
 )
 
 require (
+	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
@@ -23,6 +26,8 @@ require (
 	github.com/stretchr/testify v1.10.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
 	golang.org/x/sync v0.10.0 // indirect
+	google.golang.org/appengine v1.6.8 // indirect
+	google.golang.org/protobuf v1.34.2 // indirect
 )
 
 require (
