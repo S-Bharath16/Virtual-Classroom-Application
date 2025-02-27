@@ -2,6 +2,7 @@ package Studentmodules
 
 import (
 	"database/sql"
+	"encoding/json"
 	"log"
 	"net/http"
 
@@ -11,13 +12,20 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// Request body struct
+type StudentemailRequest struct {
+	EmailID string `json:"studentEmail"`
+}
+
 func GetCourses(c *fiber.Ctx) error {
-	//  validate student email ID 
-	emailID := c.Query("emailID")
-	if emailID == "" {
-		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"error": "emailID query parameter is required",
-		})
+	// Parse request body
+	var request StudentemailRequest
+	if err := json.Unmarshal(c.Body(), &request); err != nil {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
+	}
+
+	if request.EmailID == "" {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "emailID is required"})
 	}
 
 	dbConn, err := database.GetDB().DB()
@@ -28,13 +36,13 @@ func GetCourses(c *fiber.Ctx) error {
 		})
 	}
 
-	// Fetch sectionID, semesterID, and deptID 
+	// Fetch sectionID, semesterID, and deptID
 	var sectionID, semesterID, deptID int
 	queryStudent := `
 		SELECT sectionID, semesterID, deptID 
 		FROM studentData 
 		WHERE emailID = $1`
-	err = dbConn.QueryRow(queryStudent, emailID).Scan(&sectionID, &semesterID, &deptID)
+	err = dbConn.QueryRow(queryStudent, request.EmailID).Scan(&sectionID, &semesterID, &deptID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return c.Status(http.StatusNotFound).JSON(fiber.Map{
@@ -47,7 +55,7 @@ func GetCourses(c *fiber.Ctx) error {
 		})
 	}
 
-	// Query to fetch classroomID
+	// Query to fetch classroomID, courseID, courseName, and assigned faculty details
 	query := `
 		SELECT cf.classroomID, cd.courseID, cd.courseName, f.facultyID, f.facultyName
 		FROM courseFaculty cf
