@@ -7,8 +7,13 @@ import (
 )
 
 func UrlRouter(app *fiber.App) {
-	api := app.Group("/api");
-	api.Get("/auth/google/url", student.HandleGoogleURL);
-	api.Get("/studentAuth/google/callback", student.HandleGoogleCallback);
-	api.Get("/adminAuth/google/callback", admin.HandleGoogleCallback);
+	api := app.Group("/api") // Root API group
+
+	// Define studentAuth routes separately
+	studentAuthRouter := api.Group("/studentAuth") 
+	adminRouter := api.Group("/adminAuth")
+
+	api.Get("/auth/google/url", student.HandleGoogleURL)
+	studentAuthRouter.Get("/google/callback", student.HandleGoogleCallback)
+	adminRouter.Get("/google/callback", admin.HandleGoogleCallback)
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v4"
 	"os"
+	"strings"
 )
 
 var publicKey *rsa.PublicKey
@@ -26,6 +27,10 @@ func init() {
 }
 
 func WebTokenValidator(c *fiber.Ctx) error {
+
+	if !strings.HasPrefix(c.Path(), "/api/student/") { 
+		return c.Next()
+	}
 	tokenString := c.Get("Authorization")
 	if tokenString == "" {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Missing token"})
