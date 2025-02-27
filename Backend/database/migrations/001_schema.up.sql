@@ -206,7 +206,7 @@ INSERT INTO facultyData (emailID, facultyName, deptID) VALUES
 ('naganathan1555@gmail.com', 'Dr. Charlie Brown', 1),
 ('tharunkumarra@gmail.com', 'Dr. Daniel White', 1),
 ('hariprasathm777@gmail.com', 'Dr. Eve Black', 1),
-('bharathshan16gmail.com', 'Dr. Frank Green', 1),
+('bharathshan16@gmail.com', 'Dr. Frank Green', 1),
 ('faculty7@college.com', 'Dr. Grace Hall', 1),
 ('faculty8@college.com', 'Dr. Hannah King', 1),
 ('faculty9@college.com', 'Dr. Ian Lewis', 1),
