@@ -7,11 +7,11 @@ import (
 	"Backend/utilities/RSA"
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 	"sync"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 func fileExists(filePath string) bool {
@@ -20,7 +20,6 @@ func fileExists(filePath string) bool {
 }
 
 func main() {
-
 	fmt.Println("[LOG]: Starting Virtual Classroom Backend Server..")
 
 	cfg := config.GetConfig()
@@ -51,16 +50,19 @@ func main() {
 
 	app := fiber.New()
 
+	app.Use(cors.New(cors.Config{
+		AllowOrigins:     "http://localhost:3001", // ✅ Specify frontend URL
+		AllowMethods:     "GET,POST,PUT,DELETE",
+		AllowHeaders:     "Authorization,Content-Type",
+		AllowCredentials: true,
+	}))
+
 	routes.RegisterStudent(app)
 	routes.RegisterFacultyRoutes(app)
 	routes.RegisterStudentRoutes(app)
 
-	fmt.Println("[LOG]: Server Started on Port: ", portNum)
-	log.Fatal(app.Listen(":8080"))
-	fmt.Println("[LOG]: To close connection CTRL+C :-)")
+	fmt.Println("[LOG]: Server Started on Port:", portNum)
+	log.Fatal(app.Listen(portNum)) // ✅ Use dynamic port from config
 
-	err := http.ListenAndServe(portNum, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
+	fmt.Println("[LOG]: To close connection CTRL+C :-)")
 }
