@@ -17,6 +17,8 @@ CREATE TABLE adminData (
 
 INSERT INTO adminData (emailID, adminName)
 VALUES ('tharunkumarra@gmail.com', 'Tharun Kumar');
+INSERT INTO adminData (emailID, adminName)
+VALUES ('naganathan1555@gmail.com', 'Naganathan M R');
 
 --Section table
 CREATE TABLE sectionData (
@@ -76,7 +78,7 @@ VALUES ('CB.EN.U4CSE22253', 'tharunkumarra@gmail.com', 'Tharun Kumar', 2022, 202
 INSERT INTO studentData (rollNumber, emailID, studentName, startYear, endYear, deptID, sectionID, semesterID)
 VALUES ('CB.EN.U4CSE22222', 'hariprasathm777@gmail.com', 'Hari Prasath', 2022, 2026, 1, 1, 1);
 INSERT INTO studentData (rollNumber, emailID, studentName, startYear, endYear, deptID, sectionID, semesterID)
-VALUES ('CB.EN.U4CSE22245', 'bharathshan16gmail.com', 'Bharath', 2022, 2026, 1, 1, 1);
+VALUES ('CB.EN.U4CSE22245', 'bharathshan16@gmail.com', 'Bharath', 2022, 2026, 1, 1, 1);
 
 -- Course Table
 CREATE TABLE courseData (

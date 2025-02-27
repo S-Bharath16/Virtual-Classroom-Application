@@ -7,12 +7,8 @@ import (
 )
 
 func RegisterStudentRoutes(app *fiber.App) {
-	api := app.Group("/api") // Root API group
-
-	// Define student routes **without middleware first**
+	api := app.Group("/api")
 	student := api.Group("/student") 
-
-	// Apply middleware **only to exact student routes**
 	student.Use(middleware.WebTokenValidator)
 
 	student.Get("/getQuiz", Studentmodules.GetQuiz)

@@ -88,6 +88,9 @@ func HandleGoogleURL(c *fiber.Ctx) error {
 }
 
 func HandleGoogleCallback(c *fiber.Ctx) error {
+	// Ensure OAuth is initialized in callback function
+	InitOAuth()
+	
 	state := c.Query("state")
 	if state != oauthState {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid OAuth state"})
@@ -98,7 +101,11 @@ func HandleGoogleCallback(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Authorization code not found"})
 	}
 
-	token, err := oauthConfig.Exchange(context.Background(), code)
+	// Use a timeout context for the exchange
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	
+	token, err := oauthConfig.Exchange(ctx, code)
 	if err != nil {
 		log.Printf("[ERROR]: Code exchange failed: %v", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Code exchange failed"})
