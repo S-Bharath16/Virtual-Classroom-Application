@@ -18,7 +18,6 @@ import (
 
 	"Backend/config"
 	"Backend/database"
-	"Backend/models"
 )
 
 var (
@@ -28,6 +27,12 @@ var (
 	oauthState  = "randomStateString"
 	initOnce    sync.Once
 )
+
+type Admin struct {
+	AdminID   string `json:"adminID"`
+	EmailID   string `json:"emailID"`
+	AdminName string `json:"adminName"`
+}
 
 func InitOAuth() {
 	initOnce.Do(func() {
@@ -44,7 +49,6 @@ func InitOAuth() {
 			Endpoint:     google.Endpoint,
 		}
 
-		// Load private and public keys at initialization
 		if err := LoadKeys(); err != nil {
 			log.Fatalf("Failed to load encryption keys: %v", err)
 		}
@@ -56,28 +60,25 @@ func LoadKeys() error {
 	if err != nil {
 		return fmt.Errorf("error reading private key file: %w", err)
 	}
-	pKey, err := jwt.ParseRSAPrivateKeyFromPEM(privBytes)
+	privateKey, err = jwt.ParseRSAPrivateKeyFromPEM(privBytes)
 	if err != nil {
 		return fmt.Errorf("error parsing private key: %w", err)
 	}
-	privateKey = pKey
 
 	pubBytes, err := os.ReadFile("middleware/encryptionKeys/publicKey.pem")
 	if err != nil {
 		return fmt.Errorf("error reading public key file: %w", err)
 	}
-	pubKey, err := jwt.ParseRSAPublicKeyFromPEM(pubBytes)
+	publicKey, err = jwt.ParseRSAPublicKeyFromPEM(pubBytes)
 	if err != nil {
 		return fmt.Errorf("error parsing public key: %w", err)
 	}
-	publicKey = pubKey
 
 	return nil
 }
 
 func HandleGoogleURL(c *fiber.Ctx) error {
 	InitOAuth()
-
 	authURL := oauthConfig.AuthCodeURL(oauthState, oauth2.AccessTypeOffline)
 	if authURL == "" {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to generate OAuth URL"})
@@ -125,36 +126,21 @@ func HandleGoogleCallback(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to get database connection"})
 	}
 
-	var student models.Student
-	query := `
-        SELECT studentID, rollNumber, emailID, studentName, startYear, endYear, deptID, sectionID, semesterID 
-        FROM studentData 
-        WHERE emailID = $1
-    `
-	err = dbConn.QueryRow(query, userInfo.Email).Scan(
-		&student.StudentID,
-		&student.RollNumber,
-		&student.EmailID,
-		&student.StudentName,
-		&student.StartYear,
-		&student.EndYear,
-		&student.DeptID,
-		&student.SectionID,
-		&student.SemesterID,
-	)
-
+	var admin Admin
+	query := `SELECT adminID, emailID, adminName FROM adminData WHERE emailID = $1`
+	err = dbConn.QueryRow(query, userInfo.Email).Scan(&admin.AdminID, &admin.EmailID, &admin.AdminName)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Student not found"})
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Admin not found"})
 		}
-		log.Printf("Error querying studentData: %v", err)
+		log.Printf("Error querying adminData: %v", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Database query error"})
 	}
 
 	claimsJWT := jwt.MapClaims{
-		"sub":   student.StudentID,
-		"email": student.EmailID,
-		"name":  student.StudentName,
+		"sub":   admin.AdminID,
+		"email": admin.EmailID,
+		"name":  admin.AdminName,
 		"exp":   time.Now().Add(72 * time.Hour).Unix(),
 	}
 
@@ -164,5 +150,5 @@ func HandleGoogleCallback(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to sign JWT"})
 	}
 
-	return c.JSON(fiber.Map{"jwtToken": tokenString, "userRole": "Student"});
+	return c.JSON(fiber.Map{"jwtToken": tokenString, "userRole": "Admin"})
 }
