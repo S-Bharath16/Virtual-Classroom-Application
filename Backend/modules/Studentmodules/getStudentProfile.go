@@ -11,25 +11,31 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// Rule : fetches the student profile by joining studentData with deptData, sectionData, and semesterData, based on the emailID 
+// Rule: Fetches the student profile by joining studentData with deptData, sectionData, and semesterData, based on the emailID sent in the request body.
 func GetStudentProfile(c *fiber.Ctx) error {
-	email := c.Query("emailID")
-	if email == "" {
-		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"error": "emailID query parameter is required",
-		})
+	
+	var request struct {
+		EmailID string `json:"emailID"`
 	}
 
-	
+	// Parse 
+	if err := c.BodyParser(&request); err != nil {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
+	}
+
+	// Validate emailID
+	if request.EmailID == "" {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "emailID is required"})
+	}
+
+	// Get database connection
 	dbConn, err := database.GetDB().DB()
 	if err != nil {
 		log.Printf("Error getting DB connection: %v", err)
-		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Failed to get database connection",
-		})
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to get database connection"})
 	}
 
-	// Join query 
+	// Join query
 	query := `
 		SELECT 
 			s.rollNumber, 
@@ -48,7 +54,7 @@ func GetStudentProfile(c *fiber.Ctx) error {
 	`
 
 	var profile models.StudentProfile
-	err = dbConn.QueryRow(query, email).Scan(
+	err = dbConn.QueryRow(query, request.EmailID).Scan(
 		&profile.RollNumber,
 		&profile.EmailID,
 		&profile.StudentName,
@@ -60,15 +66,12 @@ func GetStudentProfile(c *fiber.Ctx) error {
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return c.Status(http.StatusNotFound).JSON(fiber.Map{
-				"error": "Student not found",
-			})
+			return c.Status(http.StatusNotFound).JSON(fiber.Map{"error": "Student not found"})
 		}
 		log.Printf("Error querying student profile: %v", err)
-		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Error retrieving student profile",
-		})
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": "Error retrieving student profile"})
 	}
 
+	// Return the student profile
 	return c.Status(http.StatusOK).JSON(profile)
 }
