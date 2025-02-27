@@ -15,6 +15,9 @@ CREATE TABLE adminData (
     updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+INSERT INTO adminData (emailID, adminName)
+VALUES ('tharunkumarra@gmail.com', 'Tharun Kumar');
+
 --Section table
 CREATE TABLE sectionData (
     sectionID SERIAL PRIMARY KEY,
@@ -68,6 +71,12 @@ CREATE TABLE studentData (
 
 INSERT INTO studentData (rollNumber, emailID, studentName, startYear, endYear, deptID, sectionID, semesterID)
 VALUES ('CB.EN.U4CSE22240', 'naganathan1555@gmail.com', 'Naganathan', 2022, 2026, 1, 3, 6);
+INSERT INTO studentData (rollNumber, emailID, studentName, startYear, endYear, deptID, sectionID, semesterID)
+VALUES ('CB.EN.U4CSE22253', 'tharunkumarra@gmail.com', 'Tharun Kumar', 2022, 2026, 1, 3, 6);
+INSERT INTO studentData (rollNumber, emailID, studentName, startYear, endYear, deptID, sectionID, semesterID)
+VALUES ('CB.EN.U4CSE22222', 'hariprasathm777@gmail.com', 'Hari Prasath', 2022, 2026, 1, 3, 6);
+INSERT INTO studentData (rollNumber, emailID, studentName, startYear, endYear, deptID, sectionID, semesterID)
+VALUES ('CB.EN.U4CSE22245', 'bharathshan16gmail.com', 'Bharath', 2022, 2026, 1, 3, 6);
 
 -- Course Table
 CREATE TABLE courseData (
