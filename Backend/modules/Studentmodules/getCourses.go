@@ -55,9 +55,9 @@ func GetCourses(c *fiber.Ctx) error {
 		})
 	}
 
-	// Query to fetch classroomID, courseID, courseName, and assigned faculty details
+	// Query to fetch classroomID, courseID, courseCode, courseName, and assigned faculty details
 	query := `
-		SELECT cf.classroomID, cd.courseID, cd.courseName, f.facultyID, f.facultyName
+		SELECT cf.classroomID, cd.courseID, cd.courseCode, cd.courseName, f.facultyID, f.facultyName
 		FROM courseFaculty cf
 		JOIN courseData cd ON cf.courseID = cd.courseID
 		JOIN facultyData f ON cf.facultyID = f.facultyID
@@ -78,7 +78,7 @@ func GetCourses(c *fiber.Ctx) error {
 	courses := []models.StudentCourse{}
 	for rows.Next() {
 		var sc models.StudentCourse
-		if err := rows.Scan(&sc.ClassroomID, &sc.CourseID, &sc.CourseName, &sc.FacultyID, &sc.FacultyName); err != nil {
+		if err := rows.Scan(&sc.ClassroomID, &sc.CourseID, &sc.CourseCode, &sc.CourseName, &sc.FacultyID, &sc.FacultyName); err != nil {
 			log.Printf("Error scanning row: %v", err)
 			return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
 				"error": "Failed to parse course data",
@@ -87,5 +87,13 @@ func GetCourses(c *fiber.Ctx) error {
 		courses = append(courses, sc)
 	}
 
+	if err := rows.Err(); err != nil {
+		log.Printf("Error iterating rows: %v", err)
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Error iterating through course rows",
+		})
+	}
+
+	// Return the course data
 	return c.Status(http.StatusOK).JSON(courses)
 }
