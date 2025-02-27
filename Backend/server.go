@@ -60,6 +60,7 @@ func main() {
 	routes.RegisterStudent(app)
 	routes.RegisterFacultyRoutes(app)
 	routes.RegisterStudentRoutes(app)
+	routes.UrlRouter(app)
 
 	fmt.Println("[LOG]: Server Started on Port:", portNum)
 	log.Fatal(app.Listen(portNum)) // ✅ Use dynamic port from config
