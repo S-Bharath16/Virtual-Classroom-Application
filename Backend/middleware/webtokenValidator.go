@@ -47,7 +47,6 @@ func WebTokenValidator(c *fiber.Ctx) error {
 		"sub":   claims["sub"],
 		"studentEmail": claims["email"],
 		"studentName":  claims["name"],
-		"userRole":  claims["role"],
 	}
 
 	body, err := json.Marshal(userData)

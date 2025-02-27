@@ -155,7 +155,6 @@ func HandleGoogleCallback(c *fiber.Ctx) error {
 		"sub":   student.StudentID,
 		"email": student.EmailID,
 		"name":  student.StudentName,
-		"role":  "Student",
 		"exp":   time.Now().Add(72 * time.Hour).Unix(),
 	}
 
@@ -165,5 +164,5 @@ func HandleGoogleCallback(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to sign JWT"})
 	}
 
-	return c.JSON(fiber.Map{"jwtToken": tokenString});
+	return c.JSON(fiber.Map{"jwtToken": tokenString, "userRole": "Student"});
 }
