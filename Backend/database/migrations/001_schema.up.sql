@@ -180,3 +180,22 @@ CREATE TABLE assignmentSubmission (
     createdBy INT REFERENCES facultyData(facultyID) ON DELETE SET NULL,
     updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Faculty Sample Data
+INSERT INTO facultyData (emailID, facultyName, deptID) VALUES
+('faculty1@college.com', 'Dr. Alice Johnson', 1),
+('faculty2@college.com', 'Dr. Bob Smith', 1);
+
+-- Course Sample Data
+INSERT INTO courseData (courseCode, courseName, courseDeptID, courseType, updatedBy) VALUES
+('CS101', 'Data Structures', 1, 'C', 1),
+('CS102', 'Operating Systems', 1, 'C', 1);
+
+-- Course-Faculty Mapping Sample Data
+INSERT INTO courseFaculty (courseID, facultyID, sectionID, semesterID, deptID, createdBy, updatedBy) VALUES
+(1, 1, 1, 1, 1, 1, 1),
+(2, 2, 1, 1, 1, 1, 1);
+
+INSERT INTO quizData (classroomID, quizName, quizDescription, quizData, isOpenForAll, startTime, endTime, quizDuration, createdBy) VALUES
+(1, 'Quiz 1', 'Data Structures Basics', '{"Q1":"What is a stack?","Q2":"Explain linked list"}', '1', '2024-03-10 10:00:00', '2024-03-10 11:00:00', 60, 1),
+(2, 'Quiz 2', 'OS Fundamentals', '{"Q1":"What is a process?","Q2":"Explain threading"}', '0', '2024-03-15 14:00:00', '2024-03-15 15:00:00', 60, 2);
