@@ -1,4 +1,4 @@
-package Auth
+package student
 
 import (
 	"context"
