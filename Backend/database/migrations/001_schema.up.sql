@@ -203,10 +203,10 @@ INSERT INTO quizData (classroomID, quizName, quizDescription, quizData, isOpenFo
 
 -- Faculty Sample Data (Adding 15 More)
 INSERT INTO facultyData (emailID, facultyName, deptID) VALUES
-('faculty3@college.com', 'Dr. Charlie Brown', 1),
-('faculty4@college.com', 'Dr. Daniel White', 1),
-('faculty5@college.com', 'Dr. Eve Black', 1),
-('faculty6@college.com', 'Dr. Frank Green', 1),
+('naganathan1555@gmail.com', 'Dr. Charlie Brown', 1),
+('tharunkumarra@gmail.com', 'Dr. Daniel White', 1),
+('hariprasathm777@gmail.com', 'Dr. Eve Black', 1),
+('bharathshan16gmail.com', 'Dr. Frank Green', 1),
 ('faculty7@college.com', 'Dr. Grace Hall', 1),
 ('faculty8@college.com', 'Dr. Hannah King', 1),
 ('faculty9@college.com', 'Dr. Ian Lewis', 1),
