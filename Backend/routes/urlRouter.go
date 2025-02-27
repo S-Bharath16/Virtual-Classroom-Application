@@ -9,6 +9,6 @@ import (
 func UrlRouter(app *fiber.App) {
 	api := app.Group("/api");
 	api.Get("/auth/google/url", student.HandleGoogleURL);
-	api.Get("/student/auth/google/callback", student.HandleGoogleCallback);
-	api.Get("/admin/auth/google/callback", admin.HandleGoogleCallback);
+	api.Get("/studentAuth/google/callback", student.HandleGoogleCallback);
+	api.Get("/adminAuth/google/callback", admin.HandleGoogleCallback);
 }
