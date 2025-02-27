@@ -1,9 +1,9 @@
 package Studentmodules
 
 import (
+	"database/sql"
 	"log"
 	"net/http"
-	"strconv"
 
 	"Backend/database"
 	"Backend/models"
@@ -11,41 +11,15 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-
 func GetCourses(c *fiber.Ctx) error {
-	// Retrieve, validate query parameters.
-	sectionIDParam := c.Query("sectionID")
-	semesterIDParam := c.Query("semesterID")
-	deptIDParam := c.Query("deptID")
-
-	if sectionIDParam == "" || semesterIDParam == "" || deptIDParam == "" {
+	//  validate student email ID 
+	emailID := c.Query("emailID")
+	if emailID == "" {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"error": "sectionID, semesterID, and deptID query parameters are required",
+			"error": "emailID query parameter is required",
 		})
 	}
 
-	sectionID, err := strconv.Atoi(sectionIDParam)
-	if err != nil || sectionID <= 0 {
-		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid sectionID parameter",
-		})
-	}
-
-	semesterID, err := strconv.Atoi(semesterIDParam)
-	if err != nil || semesterID <= 0 {
-		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid semesterID parameter",
-		})
-	}
-
-	deptID, err := strconv.Atoi(deptIDParam)
-	if err != nil || deptID <= 0 {
-		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid deptID parameter",
-		})
-	}
-
-	
 	dbConn, err := database.GetDB().DB()
 	if err != nil {
 		log.Printf("Error getting DB connection: %v", err)
@@ -54,8 +28,26 @@ func GetCourses(c *fiber.Ctx) error {
 		})
 	}
 
-	//  join query:  fetch the classroomID, courseID and courseName from courseData,
-	// along with the assigned faculty details from facultyData.
+	// Fetch sectionID, semesterID, and deptID 
+	var sectionID, semesterID, deptID int
+	queryStudent := `
+		SELECT sectionID, semesterID, deptID 
+		FROM studentData 
+		WHERE emailID = $1`
+	err = dbConn.QueryRow(queryStudent, emailID).Scan(&sectionID, &semesterID, &deptID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return c.Status(http.StatusNotFound).JSON(fiber.Map{
+				"error": "Student not found",
+			})
+		}
+		log.Printf("Error fetching student data: %v", err)
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to fetch student data",
+		})
+	}
+
+	// Query to fetch classroomID
 	query := `
 		SELECT cf.classroomID, cd.courseID, cd.courseName, f.facultyID, f.facultyName
 		FROM courseFaculty cf
