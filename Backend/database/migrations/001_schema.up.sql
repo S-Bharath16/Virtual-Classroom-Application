@@ -58,6 +58,9 @@ CREATE TABLE facultyData (
     updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+INSERT INTO facultyData (emailID, facultyName, deptID)
+VALUES ('naganathan1555@gmail.com', 'Naganathan', 1);
+
 -- Student Table
 CREATE TABLE studentData (
     studentID SERIAL PRIMARY KEY,
@@ -92,6 +95,9 @@ CREATE TABLE courseData (
     updatedBy INT REFERENCES adminData(adminID) ON DELETE SET NULL
 );
 
+INSERT INTO courseData (courseCode, courseName, courseDeptID, courseType, updatedBy)
+VALUES ('19CSE312', 'POPL', 1, '1', 1);
+
 -- Course-Faculty Mapping Table
 CREATE TABLE courseFaculty (
     classroomID SERIAL PRIMARY KEY,
@@ -106,6 +112,9 @@ CREATE TABLE courseFaculty (
     updatedBy INT REFERENCES adminData(adminID) ON DELETE SET NULL
 );
 
+INSERT INTO courseFaculty (courseID, facultyID, sectionID, semesterID, deptID, createdBy, updatedBy)
+VALUES (1, 1, 3, 6, 1, 1, 1);
+
 -- Meeting Table
 CREATE TABLE meetingData (
     meetingID SERIAL PRIMARY KEY,
@@ -118,6 +127,9 @@ CREATE TABLE meetingData (
     createdBy INT REFERENCES facultyData(facultyID) ON DELETE SET NULL,
     meetingDescription TEXT
 );
+
+INSERT INTO meetingData (startTime, endTime, classroomID, meetingLink, createdBy, meetingDescription) VALUES 
+('2025-03-10 09:00:00', '2025-03-10 10:30:00', 1, 'https://meet.example.com/abc123', 1, 'Project kickoff meeting for spring semester');
 
 -- Attendance Table
 -- ('0' - Absent, '1' - Present)
