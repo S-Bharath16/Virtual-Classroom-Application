@@ -217,7 +217,6 @@ INSERT INTO quizData (classroomID, quizName, quizDescription, quizData, isOpenFo
 
 -- Faculty Sample Data (Adding 15 More)
 INSERT INTO facultyData (emailID, facultyName, deptID) VALUES
-('naganathan1555@gmail.com', 'Dr. Charlie Brown', 1),
 ('tharunkumarra@gmail.com', 'Dr. Daniel White', 1),
 ('hariprasathm777@gmail.com', 'Dr. Eve Black', 1),
 ('bharathshan16@gmail.com', 'Dr. Frank Green', 1),
