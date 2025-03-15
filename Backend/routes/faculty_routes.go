@@ -12,4 +12,5 @@ func RegisterFacultyRoutes(app *fiber.App) {
 	faculty.Post("/createQuiz", Facultymodules.CreateQuiz)
 	faculty.Put("/updateFaculty", Facultymodules.UpdateFaculty)
 	faculty.Post("/recordAttendance", Facultymodules.RecordAttendance);
+	faculty.Post("/createMeeting", Facultymodules.CreateMeeting);
 }
