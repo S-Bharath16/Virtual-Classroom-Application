@@ -14,7 +14,7 @@ import (
 
 // Request body struct
 type StudentemailRequest struct {
-	EmailID string `json:"studentEmail"`
+	EmailID string `json:"emailID"`
 }
 
 func GetCourses(c *fiber.Ctx) error {

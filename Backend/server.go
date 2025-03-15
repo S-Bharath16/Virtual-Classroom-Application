@@ -51,7 +51,7 @@ func main() {
 	app := fiber.New()
 
 	app.Use(cors.New(cors.Config{
-		AllowOrigins:     "http://localhost:3000", // ✅ Specify frontend URL
+		AllowOrigins:     "http://localhost:3000",
 		AllowMethods:     "GET,POST,PUT,DELETE",
 		AllowHeaders:     "Authorization,Content-Type",
 		AllowCredentials: true,
@@ -62,8 +62,8 @@ func main() {
 	routes.RegisterStudentRoutes(app)
 	routes.UrlRouter(app)
 
-	fmt.Println("[LOG]: Server Started on Port:", portNum)
-	log.Fatal(app.Listen(portNum)) // ✅ Use dynamic port from config
+	fmt.Println("[LOG]: Server Listening on Port:", portNum)
+	log.Fatal(app.Listen(portNum));
 
 	fmt.Println("[LOG]: To close connection CTRL+C :-)")
 }

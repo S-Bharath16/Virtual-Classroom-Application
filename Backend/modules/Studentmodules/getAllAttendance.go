@@ -21,7 +21,7 @@ func GetStudentAttendance(c *fiber.Ctx) error {
 	}
 
 	var requestData struct {
-		StudentEmail string `json:"studentEmail"`
+		StudentEmail string `json:"emailID"`
 	}
 
 	if err := c.BodyParser(&requestData); err != nil {

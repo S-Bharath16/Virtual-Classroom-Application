@@ -50,8 +50,8 @@ func WebTokenValidator(c *fiber.Ctx) error {
 
 	userData := fiber.Map{
 		"sub":   claims["sub"],
-		"studentEmail": claims["email"],
-		"studentName":  claims["name"],
+		"emailID": claims["email"],
+		"userName":  claims["name"],
 	}
 
 	body, err := json.Marshal(userData)

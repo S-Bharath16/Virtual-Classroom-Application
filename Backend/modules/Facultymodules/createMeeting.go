@@ -19,6 +19,7 @@ import (
 func CreateMeeting(c *fiber.Ctx) error {
     var request struct {
         ClassroomID       int       `json:"classroomID"`
+		FacultyEmail	  string 	`json:"emailID"`
         StartTime         time.Time `json:"startTime"`
         EndTime           time.Time `json:"endTime"`
         MeetingDescription string   `json:"meetingDescription"`

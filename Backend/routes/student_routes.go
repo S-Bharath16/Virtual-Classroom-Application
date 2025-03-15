@@ -16,4 +16,5 @@ func RegisterStudentRoutes(app *fiber.App) {
 	student.Get("/getCourses", Studentmodules.GetCourses)
 	student.Get("/getallQuizzes", Studentmodules.GetAllQuizzes)
 	student.Get("/attendance", Studentmodules.GetStudentAttendance);
+	student.Get("/meeting", Studentmodules.GetMeetingLink);
 }
