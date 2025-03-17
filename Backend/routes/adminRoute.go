@@ -3,13 +3,14 @@ package routes
 import (
 	"Backend/modules/Adminmodules"
 	"Backend/modules/mailer"
-
+	"Backend/middleware"
 	"github.com/gofiber/fiber/v2"
 )
 
 func RegisterStudent(app *fiber.App) {
 	api := app.Group("/api")
 	admin := api.Group("/admin")
+	admin.Use(middleware.WebTokenValidator);
 	admin.Post("/registerStudent", Adminmodules.RegisterStudent);
 	admin.Post("/registerDepartment", Adminmodules.RegisterDepartment);
 	admin.Post("/registerFaculty", Adminmodules.RegisterFaculty);
@@ -21,4 +22,5 @@ func RegisterStudent(app *fiber.App) {
 	admin.Put("/updateCourse", Adminmodules.UpdateCourse);
 	admin.Delete("/removestudent", Adminmodules.RemoveStudent);
 	admin.Delete("/removeCourse", Adminmodules.RemoveCourse);
+	admin.Get("/getCourses", Adminmodules.GetCourses);
 }
