@@ -20,7 +20,12 @@ VALUES ('tharunkumarra@gmail.com', 'Tharun Kumar');
 INSERT INTO adminData (emailID, adminName)
 VALUES ('naganathan1555@gmail.com', 'Naganathan M R');
 INSERT INTO adminData (emailID, adminName)
+<<<<<<< Updated upstream
 VALUES ('jeevika.kkumar@gmail.com', 'Jeevika K');
+=======
+VALUES ('vvijaya463@gmail.com', 'S Bharath');
+
+>>>>>>> Stashed changes
 
 --Section table
 CREATE TABLE sectionData (
