@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
+	"encoding/json"
 
 	"Backend/database"
 	"Backend/models"
@@ -11,31 +12,27 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// Rule: Fetches the student profile by joining studentData with deptData, sectionData, and semesterData, based on the emailID sent in the request body.
 func GetStudentProfile(c *fiber.Ctx) error {
 	
-	var request struct {
+	type request struct {
 		EmailID string `json:"emailID"`
 	}
 
-	// Parse 
-	if err := c.BodyParser(&request); err != nil {
+	var requestObj request;
+	if err := json.Unmarshal(c.Body(), &requestObj); err != nil {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
 	}
 
-	// Validate emailID
-	if request.EmailID == "" {
+	if requestObj.EmailID == "" {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "emailID is required"})
 	}
 
-	// Get database connection
 	dbConn, err := database.GetDB().DB()
 	if err != nil {
 		log.Printf("Error getting DB connection: %v", err)
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to get database connection"})
 	}
 
-	// Join query
 	query := `
 		SELECT 
 			s.rollNumber, 
@@ -54,7 +51,7 @@ func GetStudentProfile(c *fiber.Ctx) error {
 	`
 
 	var profile models.StudentProfile
-	err = dbConn.QueryRow(query, request.EmailID).Scan(
+	err = dbConn.QueryRow(query, requestObj.EmailID).Scan(
 		&profile.RollNumber,
 		&profile.EmailID,
 		&profile.StudentName,
@@ -72,6 +69,5 @@ func GetStudentProfile(c *fiber.Ctx) error {
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": "Error retrieving student profile"})
 	}
 
-	// Return the student profile
 	return c.Status(http.StatusOK).JSON(profile)
 }

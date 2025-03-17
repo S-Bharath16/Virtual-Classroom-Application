@@ -12,13 +12,11 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// Request body struct
 type StudentemailRequest struct {
 	EmailID string `json:"emailID"`
 }
 
 func GetCourses(c *fiber.Ctx) error {
-	// Parse request body
 	var request StudentemailRequest
 	if err := json.Unmarshal(c.Body(), &request); err != nil {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
@@ -36,7 +34,6 @@ func GetCourses(c *fiber.Ctx) error {
 		})
 	}
 
-	// Fetch sectionID, semesterID, and deptID
 	var sectionID, semesterID, deptID int
 	queryStudent := `
 		SELECT sectionID, semesterID, deptID 
