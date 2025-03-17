@@ -27,13 +27,23 @@ func init() {
 }
 
 func WebTokenValidator(c *fiber.Ctx) error {
-
-	if !strings.HasPrefix(c.Path(), "/api/student/") && !strings.HasPrefix(c.Path(), "/api/admin") { 
+	if !strings.HasPrefix(c.Path(), "/api/student/") && !strings.HasPrefix(c.Path(), "/api/admin") {
 		return c.Next()
 	}
-	tokenString := c.Get("Authorization")
-	if tokenString == "" {
+
+	authHeader := c.Get("Authorization")
+	if authHeader == "" {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Missing token"})
+	}
+
+	parts := strings.Split(authHeader, " ")
+	if len(parts) != 2 || parts[0] != "Bearer" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Invalid token format"})
+	}
+
+	tokenString := parts[1]
+	if tokenString == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Token is empty"})
 	}
 
 	claims := jwt.MapClaims{}
@@ -49,9 +59,9 @@ func WebTokenValidator(c *fiber.Ctx) error {
 	}
 
 	userData := fiber.Map{
-		"sub":   claims["sub"],
-		"emailID": claims["email"],
-		"userName":  claims["name"],
+		"sub":      claims["sub"],
+		"emailID":  claims["email"],
+		"userName": claims["name"],
 	}
 
 	body, err := json.Marshal(userData)
