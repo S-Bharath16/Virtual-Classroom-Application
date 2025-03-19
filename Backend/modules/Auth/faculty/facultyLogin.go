@@ -44,7 +44,6 @@ func InitOAuth() {
 			Endpoint:     google.Endpoint,
 		}
 
-		// Load private and public keys at initialization
 		if err := LoadKeys(); err != nil {
 			log.Fatalf("Failed to load encryption keys: %v", err)
 		}
@@ -56,28 +55,25 @@ func LoadKeys() error {
 	if err != nil {
 		return fmt.Errorf("error reading private key file: %w", err)
 	}
-	pKey, err := jwt.ParseRSAPrivateKeyFromPEM(privBytes)
+	privateKey, err = jwt.ParseRSAPrivateKeyFromPEM(privBytes)
 	if err != nil {
 		return fmt.Errorf("error parsing private key: %w", err)
 	}
-	privateKey = pKey
 
 	pubBytes, err := os.ReadFile("middleware/encryptionKeys/publicKey.pem")
 	if err != nil {
 		return fmt.Errorf("error reading public key file: %w", err)
 	}
-	pubKey, err := jwt.ParseRSAPublicKeyFromPEM(pubBytes)
+	publicKey, err = jwt.ParseRSAPublicKeyFromPEM(pubBytes)
 	if err != nil {
 		return fmt.Errorf("error parsing public key: %w", err)
 	}
-	publicKey = pubKey
 
 	return nil
 }
 
 func HandleGoogleURL(c *fiber.Ctx) error {
 	InitOAuth()
-
 	authURL := oauthConfig.AuthCodeURL(oauthState, oauth2.AccessTypeOffline)
 	if authURL == "" {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to generate OAuth URL"})
@@ -87,8 +83,9 @@ func HandleGoogleURL(c *fiber.Ctx) error {
 }
 
 func HandleGoogleCallback(c *fiber.Ctx) error {
-
-	fmt.Println("Reached Faculty..");
+	// Ensure OAuth is initialized in callback function
+	InitOAuth()
+	
 	state := c.Query("state")
 	if state != oauthState {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid OAuth state"})
@@ -99,7 +96,11 @@ func HandleGoogleCallback(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Authorization code not found"})
 	}
 
-	token, err := oauthConfig.Exchange(context.Background(), code)
+	// Use a timeout context for the exchange
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	
+	token, err := oauthConfig.Exchange(ctx, code)
 	if err != nil {
 		log.Printf("[ERROR]: Code exchange failed: %v", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Code exchange failed"})
@@ -128,25 +129,13 @@ func HandleGoogleCallback(c *fiber.Ctx) error {
 	}
 
 	var faculty models.Faculty;
-	query := `
-        SELECT facultyID, emailID, facultyName, deptID, createdAt, updatedAt 
-        FROM facultyData 
-        WHERE emailID = $1
-    `
-	err = dbConn.QueryRow(query, userInfo.Email).Scan(
-		&faculty.FacultyID,
-		&faculty.EmailID,
-		&faculty.FacultyName,
-		&faculty.DeptID,
-		&faculty.CreatedAt,
-		&faculty.UpdatedAt,
-	)
-
+	query := `SELECT facultyID, emailID, facultyName, deptID, createdAt, updatedAt FROM facultyData WHERE emailID = $1`
+	err = dbConn.QueryRow(query, userInfo.Email).Scan(&faculty.FacultyID, &faculty.EmailID, &faculty.FacultyName, &faculty.DeptID, &faculty.CreatedAt, &faculty.UpdatedAt)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Student not found"})
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Admin not found"})
 		}
-		log.Printf("Error querying studentData: %v", err)
+		log.Printf("Error querying adminData: %v", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Database query error"})
 	}
 
@@ -163,6 +152,5 @@ func HandleGoogleCallback(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to sign JWT"})
 	}
 
-	fmt.Println(tokenString);
-	return c.JSON(fiber.Map{"jwtToken": tokenString, "userRole": "Faculty"});
+	return c.JSON(fiber.Map{"jwtToken": tokenString, "userRole": "Faculty"})
 }
