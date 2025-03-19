@@ -25,7 +25,7 @@ func main() {
 	cfg := config.GetConfig()
 	portNum := ":" + cfg.ServerPort
 
-	config.LoadEnv()
+	config.LoadEnv();
 	database.ConnectDB()
 
 	privateKeyPath := "middleware/encryptionKeys/privateKey.pem"

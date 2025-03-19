@@ -183,12 +183,14 @@ CREATE TABLE assignmentData (
     classroomID INT REFERENCES courseFaculty(classroomID) ON DELETE CASCADE,
     assignmentName VARCHAR(255) NOT NULL,
     assignmentDescription TEXT,
-    assignmentData TEXT,
+    assignmentText TEXT, -- For text-based assignments
+    imagePath VARCHAR(255), -- Local path for image (if any)
+    documentPath VARCHAR(255), -- Local path for document (if any)
     startTime TIMESTAMP NOT NULL,
     endTime TIMESTAMP NOT NULL,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updatedBy INT REFERENCES facultyData(facultyID) ON DELETE SET NULL
+    createdBy INT REFERENCES facultyData(facultyID) ON DELETE SET NULL
 );
 
 -- Assignment Submission Table
