@@ -4,10 +4,11 @@ import (
 	"crypto/rsa"
 	"encoding/json"
 	"errors"
-	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt/v4"
 	"os"
 	"strings"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v4"
 )
 
 var publicKey *rsa.PublicKey
