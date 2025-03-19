@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"Backend/database"
-	//"Backend/models"
 
 	"github.com/gofiber/fiber/v2"
 )
