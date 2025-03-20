@@ -6,7 +6,7 @@ import (
 	"errors"
 	"os"
 	"strings"
-
+	"log"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v4"
 )
@@ -33,6 +33,7 @@ func WebTokenValidator(c *fiber.Ctx) error {
 	}
 
 	authHeader := c.Get("Authorization")
+	log.Println(authHeader);
 	if authHeader == "" {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Missing token"})
 	}

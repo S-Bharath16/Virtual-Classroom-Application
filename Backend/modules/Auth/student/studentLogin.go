@@ -165,5 +165,5 @@ func HandleGoogleCallback(c *fiber.Ctx) error {
 	}
 
 	fmt.Println(tokenString);
-	return c.JSON(fiber.Map{"jwtToken": tokenString, "userRole": "Student"});
+	return c.JSON(fiber.Map{"jwtToken": tokenString, "userRole": "Student", "accessToken": token.AccessToken});
 }
