@@ -28,7 +28,7 @@ func init() {
 }
 
 func WebTokenValidator(c *fiber.Ctx) error {
-	if !strings.HasPrefix(c.Path(), "/api/student/") && !strings.HasPrefix(c.Path(), "/api/admin") {
+	if !strings.HasPrefix(c.Path(), "/api/student/") && !strings.HasPrefix(c.Path(), "/api/admin") && !strings.HasPrefix(c.Path(), "/api/faculty") {
 		return c.Next()
 	}
 

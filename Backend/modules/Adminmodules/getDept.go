@@ -2,6 +2,7 @@ package Adminmodules
 
 import (
 	"log"
+	"fmt"
 	"net/http"
 
 	"Backend/database"
@@ -12,7 +13,7 @@ import (
 
 
 func GetAllDepartments(c *fiber.Ctx) error {
-	
+	fmt.Println("[LOG]: Received Request From Load Tester :)");
 	dbConn, err := database.GetDB().DB()
 	if err != nil {
 		log.Printf("Error getting DB connection: %v", err)
