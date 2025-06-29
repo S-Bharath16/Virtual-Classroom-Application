@@ -23,4 +23,5 @@ func RegisterStudent(app *fiber.App) {
 	admin.Delete("/removestudent", Adminmodules.RemoveStudent);
 	admin.Delete("/removeCourse", Adminmodules.RemoveCourse);
 	admin.Get("/getCourses", Adminmodules.GetCourses);
+	admin.Get("/getStudents", Adminmodules.GetAllStudents)
 }
